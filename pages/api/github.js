@@ -1,8 +1,4 @@
-// pages/api/github.js — GitHub proxy with Redis cache + Supabase persistence
-
-import { cacheGet, cacheSet, keys } from '../../lib/cache'
-import { saveSearch } from '../../lib/supabase'
-import { computeAnalytics } from '../../lib/analytics'
+// pages/api/github.js — GitHub proxy (works without Redis/Supabase)
 
 const GH_BASE = 'https://api.github.com'
 
@@ -37,38 +33,16 @@ export default async function handler(req, res) {
   const { username } = req.query
   if (!username?.trim()) return res.status(400).json({ error: 'username required' })
 
-  const login = username.trim().toLowerCase()
-
-  // ── 1. Check Redis cache first ─────────────────────────────────────────────
-  const cached = await cacheGet(keys.github(login))
-  if (cached) {
-    console.log(`[cache HIT] ${login}`)
-    return res.status(200).json({ ...cached, fromCache: true })
-  }
-  console.log(`[cache MISS] ${login} — fetching from GitHub`)
-
-  // ── 2. Fetch from GitHub ───────────────────────────────────────────────────
   try {
     const [user, repos, events] = await Promise.all([
-      ghFetch(`/users/${login}`),
-      fetchAllRepos(login),
-      ghFetch(`/users/${login}/events?per_page=100`),
+      ghFetch(`/users/${username}`),
+      fetchAllRepos(username),
+      ghFetch(`/users/${username}/events?per_page=100`),
     ])
-
-    const payload = { user, repos, events }
-
-    // ── 3. Save to Redis cache (1 hour TTL) ───────────────────────────────────
-    await cacheSet(keys.github(login), payload)
-
-    // ── 4. Persist to Supabase DB (async, non-blocking) ───────────────────────
-    const analyticsData = computeAnalytics(user, repos, events)
-    saveSearch({ username: login, userData: user, analyticsData }).catch(() => {})
-
-    res.status(200).json({ ...payload, fromCache: false })
+    res.status(200).json({ user, repos, events, fromCache: false })
   } catch (err) {
     const status = err.message.includes('not found') ? 404
-                 : err.message.includes('403')       ? 403
-                 : 500
+                 : err.message.includes('403') ? 403 : 500
     res.status(status).json({ error: err.message })
   }
 }
