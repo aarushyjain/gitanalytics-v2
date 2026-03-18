@@ -102,7 +102,7 @@ npm run dev
 ```
 
 1. Open http://localhost:3000
-2. Type `aarushyjain` → click Analyze
+2. Type `github id` → click Analyze
 3. After analysis, click "◈ AI Chat" tab
 4. Try these questions:
    - "What are their strongest technical skills?"
