@@ -9,7 +9,7 @@ import Card        from '../components/Card'
 import StatCard    from '../components/StatCard'
 import LandingHero from '../components/LandingHero'
 import ChatPanel   from '../components/ChatPanel'
- 
+
 /* ── Tooltip ─────────────────────────────────────────────────────── */
 function ChartTip({ active, payload, label }) {
   if (!active || !payload?.length) return null
@@ -21,7 +21,7 @@ function ChartTip({ active, payload, label }) {
     </div>
   )
 }
- 
+
 /* ── Animated progress row ───────────────────────────────────────── */
 function BarRow({ label, value, max, color = '#0969da', delay = '0s' }) {
   const pct = Math.min((value / Math.max(max, 1)) * 100, 100)
@@ -42,7 +42,7 @@ function BarRow({ label, value, max, color = '#0969da', delay = '0s' }) {
     </div>
   )
 }
- 
+
 /* ── Insight configs ─────────────────────────────────────────────── */
 const INSIGHT_CFG = {
   strength:   { bg:'var(--green-bg)',  border:'var(--green-bd)',  dot:'#1a7f37', label:'Strength',  icon:'💪' },
@@ -50,7 +50,7 @@ const INSIGHT_CFG = {
   prediction: { bg:'var(--purple-bg)',border:'var(--purple-bd)', dot:'#6639ba', label:'Forecast',  icon:'🔮' },
   warning:    { bg:'var(--amber-bg)', border:'var(--amber-bd)',  dot:'#9a6700', label:'Warning',   icon:'⚠️' },
 }
- 
+
 /* ══════════════════════════════════════════════════════════════════
    DASHBOARD
 ══════════════════════════════════════════════════════════════════ */
@@ -72,19 +72,19 @@ export default function Dashboard() {
   const [chatLoading,     setChatLoading]     = useState(false)
   const [trending,        setTrending]        = useState({ recent:[] })
   const chatEndRef = useRef(null)
- 
+
   useEffect(() => {
     fetch('/api/trending').then(r=>r.json()).then(d=>setTrending(d)).catch(()=>{})
   }, [])
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior:'smooth' }) }, [chatMsgs])
- 
+
   async function fetchAndAnalyze(uname) {
     const res = await fetch(`/api/github?username=${encodeURIComponent(uname)}`)
     if (!res.ok) { const e = await res.json(); throw new Error(e.error||`Failed: ${uname}`) }
     const { user, repos, events } = await res.json()
     return { user, repos, events, analytics: computeAnalytics(user, repos, events) }
   }
- 
+
   async function handleSearch() {
     if (!username.trim()) return
     setLoading(true); setError('')
@@ -103,12 +103,16 @@ export default function Dashboard() {
       setStep('Generating AI insights…'); setInsightsLoading(true)
       fetch('/api/insights', { method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({ user:r.user, analytics:r.analytics }) })
-        .then(res=>res.json()).then(({insights:ins})=>setInsights(ins||[]))
+        .then(res=>res.json()).then(({insights:ins, geminiError})=>{
+          setInsights(ins||[])
+          if (geminiError) console.error('Gemini:', geminiError)
+          if (ins && ins.length === 0 && geminiError) setInsights([{ title: 'AI Error', body: geminiError, type:'warning' }])
+        })
         .catch(()=>{}).finally(()=>setInsightsLoading(false))
     } catch(e) { setError(e.message) }
     finally { setLoading(false); setStep('') }
   }
- 
+
   async function sendChat(overrideText) {
     const text = overrideText || chatInput
     if (!text.trim() || !data) return
@@ -139,7 +143,7 @@ export default function Dashboard() {
     } catch { setChatMsgs(prev=>[...prev, { role:'assistant', content:'Error reaching AI.' }]) }
     finally { setChatLoading(false) }
   }
- 
+
   const TABS = [
     { id:'overview',     label:'Overview',      icon:'📊' },
     { id:'repositories', label:'Repositories',  icon:'📁' },
@@ -147,7 +151,7 @@ export default function Dashboard() {
     { id:'compare',      label:'Compare',       icon:'⇄'  },
     { id:'chatbot',      label:'AI Chat',       icon:'💬' },
   ]
- 
+
   /* ── Loading ─────────────────────────────────────────────────────── */
   if (loading) return (
     <div style={{ minHeight:'100vh', display:'flex', flexDirection:'column', alignItems:'center',
@@ -164,18 +168,18 @@ export default function Dashboard() {
       </div>
     </div>
   )
- 
+
   /* ── Landing ─────────────────────────────────────────────────────── */
   if (!data) return (
     <LandingHero username={username} setUsername={setUsername}
       compareUsername={compareUsername} setCompareUsername={setCompareUsername}
       onSearch={handleSearch} loading={loading} step={step} error={error} trending={trending}/>
   )
- 
+
   /* ── Dashboard ───────────────────────────────────────────────────── */
   return (
     <div style={{ minHeight:'100vh', background:'var(--bg2)' }}>
- 
+
       {/* ── Navbar ─────────────────────────────────────────────────── */}
       <nav className="navbar fade-in">
         <div style={{ maxWidth:1200, margin:'0 auto', padding:'0 24px',
@@ -209,9 +213,9 @@ export default function Dashboard() {
             onClick={()=>{ setData(null); setAnalytics(null) }}>← New Search</button>
         </div>
       </nav>
- 
+
       <div style={{ maxWidth:1200, margin:'0 auto', padding:'24px 24px 56px' }}>
- 
+
         {/* ── Profile card ────────────────────────────────────────────── */}
         <div className="card fade-up" style={{ padding:'22px 26px', marginBottom:18, overflow:'hidden', position:'relative' }}>
           {/* Subtle gradient top accent */}
@@ -265,7 +269,7 @@ export default function Dashboard() {
             <ScoreGauge score={analytics.score}/>
           </div>
         </div>
- 
+
         {/* ── Stat cards ──────────────────────────────────────────────── */}
         <div className="stagger" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(155px,1fr))', gap:12, marginBottom:18 }}>
           <StatCard label="Total Stars"   value={analytics.totalStars.toLocaleString()} icon="⭐" accent="linear-gradient(90deg,#f6e05e,#ed8936)" delay=".04s"/>
@@ -275,7 +279,7 @@ export default function Dashboard() {
           <StatCard label="Followers"     value={data.user.followers.toLocaleString()} icon="👥" accent="linear-gradient(90deg,#6639ba,#a78bfa)" delay=".20s"/>
           <StatCard label="Total Forks"   value={analytics.totalForks.toLocaleString()} icon="⑂" accent="linear-gradient(90deg,#9a6700,#d4a72c)" delay=".24s"/>
         </div>
- 
+
         {/* ── Tabs ────────────────────────────────────────────────────── */}
         <div className="tab-bar fade-in" style={{ marginBottom:18, background:'var(--bg)',
           borderRadius:'var(--r-lg) var(--r-lg) 0 0', paddingInline:8, paddingTop:4 }}>
@@ -285,11 +289,11 @@ export default function Dashboard() {
             </button>
           ))}
         </div>
- 
+
         {/* ════════════════ OVERVIEW ════════════════ */}
         {tab==='overview' && (
           <div className="stagger" style={{ display:'grid', gap:14, gridTemplateColumns:'repeat(12,1fr)' }}>
- 
+
             {/* Commit area chart */}
             <div className="fade-up" style={{ gridColumn:'span 8' }}>
               <Card title="Commit Activity" description="Last 12 weeks" accent="linear-gradient(90deg,#0969da55,transparent)">
@@ -319,7 +323,7 @@ export default function Dashboard() {
                 </div>
               </Card>
             </div>
- 
+
             {/* Score breakdown */}
             <div className="fade-up" style={{ gridColumn:'span 4' }}>
               <Card title="Score Breakdown" description="5 weighted factors" accent="linear-gradient(90deg,#f6a62355,transparent)">
@@ -329,7 +333,7 @@ export default function Dashboard() {
                 ))}
               </Card>
             </div>
- 
+
             {/* Language donut */}
             <div className="fade-up" style={{ gridColumn:'span 5' }}>
               <Card title="Language Distribution" accent="linear-gradient(90deg,#6639ba55,transparent)">
@@ -338,7 +342,7 @@ export default function Dashboard() {
                   : <p style={{ color:'var(--text3)', fontSize:13 }}>No language data available</p>}
               </Card>
             </div>
- 
+
             {/* NLP Skill signals */}
             <div className="fade-up" style={{ gridColumn:'span 7' }}>
               <Card title="Skill Signals" description="Extracted from commit messages via NLP"
@@ -352,7 +356,7 @@ export default function Dashboard() {
                 }
               </Card>
             </div>
- 
+
             {/* AI Insights */}
             <div className="fade-up" style={{ gridColumn:'span 12' }}>
               <Card title="AI Insights" description="Generated by Gemini AI — refreshed every 24 hours"
@@ -368,9 +372,10 @@ export default function Dashboard() {
                     Generating insights with Gemini AI…
                   </div>
                 ) : insights.length === 0 ? (
-                  <div style={{ display:'flex', alignItems:'center', gap:10, color:'var(--text2)', fontSize:13, padding:'8px 0' }}>
-                    <div style={{ width:14, height:14, border:'2px solid var(--bg3)', borderTopColor:'var(--blue)', borderRadius:'50%', animation:'spin .7s linear infinite', flexShrink:0 }}/>
-                    Generating insights…
+                  <div style={{ padding:'12px 14px', background:'var(--bg2)', border:'1px solid var(--border)',
+                    borderRadius:'var(--r-md)', fontSize:13, color:'var(--text2)' }}>
+                    Add <code style={{ background:'var(--bg3)', padding:'1px 6px', borderRadius:4, fontSize:12 }}>GEMINI_API_KEY</code> to{' '}
+                    <code style={{ background:'var(--bg3)', padding:'1px 6px', borderRadius:4, fontSize:12 }}>.env.local</code> to enable AI insights.
                   </div>
                 ) : (
                   <div className="stagger" style={{ display:'grid', gap:12, gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))' }}>
@@ -395,7 +400,7 @@ export default function Dashboard() {
                 )}
               </Card>
             </div>
- 
+
             {/* Contribution heatmap */}
             <div className="fade-up" style={{ gridColumn:'span 12' }}>
               <Card title="Contribution Heatmap" description="52 weeks of GitHub activity"
@@ -405,7 +410,7 @@ export default function Dashboard() {
             </div>
           </div>
         )}
- 
+
         {/* ════════════════ REPOSITORIES ════════════════ */}
         {tab==='repositories' && (
           <div className="card fade-up" style={{ overflow:'hidden' }}>
@@ -468,7 +473,7 @@ export default function Dashboard() {
             </div>
           </div>
         )}
- 
+
         {/* ════════════════ ACTIVITY ════════════════ */}
         {tab==='activity' && (
           <div className="stagger" style={{ display:'grid', gap:14, gridTemplateColumns:'repeat(auto-fit,minmax(300px,1fr))' }}>
@@ -522,7 +527,7 @@ export default function Dashboard() {
             </Card>
           </div>
         )}
- 
+
         {/* ════════════════ COMPARE ════════════════ */}
         {tab==='compare' && (
           <div>
@@ -595,7 +600,7 @@ export default function Dashboard() {
             )}
           </div>
         )}
- 
+
         {/* ════════════════ CHATBOT ════════════════ */}
         {tab==='chatbot' && (
           <div className="fade-up">
@@ -606,9 +611,8 @@ export default function Dashboard() {
               chatEndRef={chatEndRef}/>
           </div>
         )}
- 
+
       </div>
     </div>
   )
 }
- 
