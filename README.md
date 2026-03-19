@@ -1,185 +1,73 @@
-# GitAnalytics v2 — Full Stack AI Developer Dashboard
+<div align="center">
 
-> Next.js · Redis Cache · Supabase DB · Claude AI · Vercel Deployment
+# GitAnalytics v2
 
----
+**Turn any GitHub username into a full developer intelligence report — powered by AI.**
 
-## FREE Services Used (No Credit Card Needed)
+[![Live Demo](https://img.shields.io/badge/Live-Demo-black?style=for-the-badge)](https://gitanalytics-v2.vercel.app)
+[![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=nextdotjs)](https://nextjs.org)
+[![Claude AI](https://img.shields.io/badge/Claude-AI-orange?style=for-the-badge)](https://anthropic.com)
+[![Vercel](https://img.shields.io/badge/Deployed-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com)
 
-| Service      | What it does              | Free Tier                    | Sign up |
-|-------------|---------------------------|------------------------------|---------|
-| GitHub Token | API access (no CORS)      | 5000 req/hr (60 without)     | github.com/settings/tokens |
-| Anthropic   | AI insights + chatbot     | $5 free credit (~500 calls)  | console.anthropic.com |
-| Supabase    | Postgres DB (search history, cached insights) | 500MB forever | supabase.com |
-| Upstash     | Redis cache (1hr TTL)     | 10,000 req/day forever       | upstash.com |
-| Vercel      | Hosting + serverless      | Unlimited hobby projects     | vercel.com |
+</div>
 
 ---
 
-## STEP 1 — Get Free API Keys
+## What It Does
 
-### A. GitHub Token (5 minutes)
-1. Go to https://github.com/settings/tokens
-2. Click "Generate new token (classic)"
-3. Name it: `gitanalytics`
-4. Select NO scopes (public data only)
-5. Click Generate → Copy the token (starts with `ghp_`)
+Enter any GitHub username → get an AI-powered breakdown:
 
-### B. Anthropic API Key (3 minutes)
-1. Go to https://console.anthropic.com
-2. Sign up (email only, no credit card)
-3. You get $5 free credit automatically
-4. Go to API Keys → Create Key
-5. Copy the key (starts with `sk-ant-`)
-
-### C. Supabase Database (5 minutes)
-1. Go to https://supabase.com → Sign Up Free
-2. New Project → Name: `gitanalytics` → Set a DB Password (save it!) → Free tier
-3. Wait ~2 minutes for project to initialize
-4. Go to: Project Settings → API
-5. Copy these 3 values:
-   - "Project URL" → SUPABASE_URL
-   - "anon public" key → SUPABASE_ANON_KEY
-   - "service_role secret" key → SUPABASE_SERVICE_KEY
-
-### D. Upstash Redis Cache (3 minutes)
-1. Go to https://upstash.com → Sign up (GitHub login works)
-2. Create Database → Name: `gitanalytics` → Region: US-East-1 → Free tier
-3. Click your database → "REST API" tab
-4. Copy:
-   - UPSTASH_REDIS_REST_URL
-   - UPSTASH_REDIS_REST_TOKEN
+- **Productivity Score** — commit frequency, contribution patterns, NLP analysis
+- **Skill Fingerprint** — languages, repos, activity heatmap
+- **Career Predictions** — linear regression on growth trajectory
+- **AI Chat** — ask anything: *"Write a recruiter bio"*, *"Rate their open source work"*, *"What should they learn next?"*
 
 ---
 
-## STEP 2 — Local Setup
+## Stack
+
+| Layer | Tech |
+|---|---|
+| Frontend | Next.js 14 · React 18 · Recharts · Tailwind |
+| AI | Claude API (chat + insights) |
+| Infra | Vercel · GitHub REST API |
+
+---
+
+## Setup 
+
+### 1. Get API Keys
+
+| Service | Where | What you need |
+|---|---|---|
+| GitHub | [settings/tokens](https://github.com/settings/tokens) → Classic → No scopes | `GITHUB_TOKEN` |
+| Anthropic | [console.anthropic.com](https://console.anthropic.com) → API Keys | `ANTHROPIC_API_KEY` ($5 free credit) |
+
+### 2. Run Locally
 
 ```bash
-# 1. Extract and enter project
-cd D:\
-unzip gitanalytics-v2.zip
-cd gitanalytics-v2\gitanalytics-v2
-
-# 2. Install dependencies
+git clone https://github.com/aarushyjain/gitanalytics-v2
+cd gitanalytics-v2
 npm install
-
-# 3. Fill in your keys
-notepad .env.local
-# Paste all 7 keys from Step 1 above
-
-# 4. Set up Supabase tables
-node scripts/setup-db.js
-# This prints SQL → copy it → paste in Supabase SQL Editor → Run
-
-# 5. Start development server
-npm run dev
-# Open: http://localhost:3000
 ```
 
----
-
-## STEP 3 — Set Up Supabase Tables
-
-After running `node scripts/setup-db.js`, you'll see SQL printed in the terminal.
-
-1. Go to https://supabase.com/dashboard → Your Project
-2. Click "SQL Editor" in the left sidebar
-3. Click "New Query"
-4. Paste the SQL that was printed
-5. Click "Run" (green button)
-6. You should see "Success. No rows returned"
-
-Your tables are now created:
-- `searches` — stores every analyzed profile
-- `insights` — caches AI insights for 24 hours
-
----
-
-## STEP 4 — Run and Test
+Create `.env.local` with all keys from above, then:
 
 ```bash
-npm run dev
+node scripts/setup-db.js   # prints SQL → paste in Supabase SQL Editor → Run
+npm run dev                 # → http://localhost:3000
 ```
 
-1. Open http://localhost:3000
-2. Type `github id` → click Analyze
-3. After analysis, click "◈ AI Chat" tab
-4. Try these questions:
-   - "What are their strongest technical skills?"
-   - "Write a recruiter bio for this developer"
-   - "What jobs would suit them?"
-   - "Rate their open source contributions out of 10"
-   - "What should they learn next?"
-
-The chatbot has FULL access to all profile data and will answer specifically.
-
----
-
-## STEP 5 — Deploy to Vercel (FREE)
+### 3. Deploy to Vercel
 
 ```bash
-# 1. Create GitHub repo
-# Go to github.com/new → name: gitanalytics → Create
-
-# 2. Push your code
-git init
-git add .
-git commit -m "feat: GitAnalytics v2 with AI + DB"
-git remote add origin https://github.com/YOUR_USERNAME/gitanalytics.git
-git push -u origin main
-
-# 3. Deploy on Vercel
-# Go to vercel.com → New Project → Import your repo
-# Framework: Next.js (auto-detected)
-# Add Environment Variables (all 7 from .env.local)
-# Click Deploy → live in ~2 minutes
+# Push to GitHub, then:
+# vercel.com → New Project → Import repo → Add env vars → Deploy
 ```
 
-Your live URL: `https://gitanalytics-yourname.vercel.app`
-
+Live in ~2 minutes.
 ---
 
-## Architecture
-
-```
-Browser
-  │
-  ├── GET /api/github?username=xxx
-  │     ├── 1. Check Upstash Redis (1hr cache)
-  │     ├── 2. If miss → fetch GitHub API (with token)
-  │     ├── 3. Cache result in Redis
-  │     └── 4. Save to Supabase DB (async)
-  │
-  ├── POST /api/insights
-  │     ├── 1. Check Redis cache
-  │     ├── 2. Check Supabase insights table (24hr)
-  │     ├── 3. If miss → call Claude API
-  │     ├── 4. Cache in Redis + save to Supabase
-  │     └── 5. Return insights
-  │
-  ├── POST /api/chat
-  │     ├── Full profile context injected into system prompt
-  │     └── Claude answers with real data every time
-  │
-  └── GET /api/trending
-        ├── Check Redis (5min cache)
-        └── Query Supabase for recent + top searches
-```
-
----
-
-## Resume Bullet Points
-
-```
-GitAnalytics — AI Developer Analytics Dashboard
-• Built full-stack Next.js dashboard analyzing GitHub profiles with AI-powered
-  productivity scoring, commit NLP analysis, and linear regression predictions
-• Integrated Claude AI chatbot with full profile context injection for
-  data-driven developer Q&A (skills, career advice, recruiter summaries)
-• Implemented 2-layer caching (Upstash Redis + Supabase Postgres) reducing
-  API latency by ~95% on repeat queries
-• Deployed on Vercel with server-side API proxying, eliminating CORS issues
-  and securing all API keys from client exposure
-Stack: Next.js 14 · React 18 · Recharts · Claude API · GitHub REST API ·
-       Supabase · Upstash Redis · Vercel
-```
+<div align="center">
+Built by <a href="https://github.com/aarushyjain">Aarushi Jain</a>
+</div>
