@@ -45,6 +45,6 @@ Return ONLY a valid JSON object. No markdown, no backticks, no explanation — r
     res.status(200).json({ insights: parsed.insights || [] })
   } catch (err) {
     console.error('Gemini insights error:', err.message)
-    res.status(200).json({ insights: [] })
+    res.status(500).json({ error: err.message })
   }
 }

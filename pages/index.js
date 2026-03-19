@@ -368,10 +368,9 @@ export default function Dashboard() {
                     Generating insights with Gemini AI…
                   </div>
                 ) : insights.length === 0 ? (
-                  <div style={{ padding:'12px 14px', background:'var(--bg2)', border:'1px solid var(--border)',
-                    borderRadius:'var(--r-md)', fontSize:13, color:'var(--text2)' }}>
-                    Add <code style={{ background:'var(--bg3)', padding:'1px 6px', borderRadius:4, fontSize:12 }}>GEMINI_API_KEY</code> to{' '}
-                    <code style={{ background:'var(--bg3)', padding:'1px 6px', borderRadius:4, fontSize:12 }}>.env.local</code> to enable AI insights.
+                  <div style={{ display:'flex', alignItems:'center', gap:10, color:'var(--text2)', fontSize:13, padding:'8px 0' }}>
+                    <div style={{ width:14, height:14, border:'2px solid var(--bg3)', borderTopColor:'var(--blue)', borderRadius:'50%', animation:'spin .7s linear infinite', flexShrink:0 }}/>
+                    Generating insights…
                   </div>
                 ) : (
                   <div className="stagger" style={{ display:'grid', gap:12, gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))' }}>
