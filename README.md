@@ -69,5 +69,5 @@ Live in ~2 minutes.
 ---
 
 <div align="center">
-Built by <a href="https://github.com/aarushyjain">Aarush Jain</a>
+Built by <a href="https://github.com/aarushyjain">Aarushi Jain</a>
 </div>
