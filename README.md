@@ -32,8 +32,6 @@ Enter any GitHub username → get an AI-powered breakdown:
 | AI | Claude API (chat + insights) |
 | Infra | Vercel · GitHub REST API |
 
-**2-layer caching** (Redis → Supabase) cuts repeat API latency by ~95%.
-
 ---
 
 ## Setup 
