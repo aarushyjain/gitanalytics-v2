@@ -188,7 +188,8 @@ export default function LandingHero({ username, setUsername, compareUsername, se
         {/* Feature badges */}
         <div className="fade-up stagger" style={{ display:'flex', gap:6, flexWrap:'wrap',
           justifyContent:'center', marginTop:28, animationDelay:'0.26s' }}>
-          {[['🗄️','Redis Cache'],['🐘','Supabase DB'],['✨','AI Insights'],['🧠','NLP Skills'],['⇄','Compare'],['💬','Smart Chat']].map(([icon,label])=>(
+          {[['✨','AI Insights'],['🧠','NLP Skills'],['📊','Analytics'],['⇄','Compare'],['💬','Smart Chat'],['⚡','Live Data']].map
+          (([icon,label])=>(
             <span key={label} className="badge badge-neutral">
               <span>{icon}</span> {label}
             </span>
