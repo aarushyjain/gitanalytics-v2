@@ -30,15 +30,13 @@ Enter any GitHub username → get an AI-powered breakdown:
 |---|---|
 | Frontend | Next.js 14 · React 18 · Recharts · Tailwind |
 | AI | Claude API (chat + insights) |
-| Cache | Upstash Redis — 1hr TTL |
-| Database | Supabase Postgres — search history + cached insights |
 | Infra | Vercel · GitHub REST API |
 
 **2-layer caching** (Redis → Supabase) cuts repeat API latency by ~95%.
 
 ---
 
-## Setup (All Free, No Credit Card)
+## Setup 
 
 ### 1. Get API Keys
 
@@ -46,8 +44,6 @@ Enter any GitHub username → get an AI-powered breakdown:
 |---|---|---|
 | GitHub | [settings/tokens](https://github.com/settings/tokens) → Classic → No scopes | `GITHUB_TOKEN` |
 | Anthropic | [console.anthropic.com](https://console.anthropic.com) → API Keys | `ANTHROPIC_API_KEY` ($5 free credit) |
-| Supabase | [supabase.com](https://supabase.com) → Project Settings → API | `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_KEY` |
-| Upstash | [upstash.com](https://upstash.com) → REST API tab | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` |
 
 ### 2. Run Locally
 
@@ -57,7 +53,7 @@ cd gitanalytics-v2
 npm install
 ```
 
-Create `.env.local` with all 7 keys from above, then:
+Create `.env.local` with all keys from above, then:
 
 ```bash
 node scripts/setup-db.js   # prints SQL → paste in Supabase SQL Editor → Run
@@ -72,30 +68,6 @@ npm run dev                 # → http://localhost:3000
 ```
 
 Live in ~2 minutes.
-
----
-
-## Architecture
-
-```
-Browser
-  ├── /api/github     → Redis cache → GitHub API → Supabase
-  ├── /api/insights   → Redis → Supabase → Claude API
-  ├── /api/chat       → Full profile injected into Claude context
-  └── /api/trending   → Redis (5min) → Supabase recent searches
-```
-
----
-
-## Resume Bullet
-
-```
-• Built full-stack AI developer analytics dashboard (Next.js + Claude API)
-  with commit NLP, productivity scoring, and linear regression predictions
-• Implemented 2-layer caching (Redis + Postgres) reducing API latency ~95%
-• Deployed on Vercel with server-side proxying — zero client-side key exposure
-```
-
 ---
 
 <div align="center">
