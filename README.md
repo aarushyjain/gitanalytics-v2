@@ -29,7 +29,7 @@ Enter any GitHub username → get an AI-powered breakdown:
 | Layer | Tech |
 |---|---|
 | Frontend | Next.js 14 · React 18 · Recharts · Tailwind |
-| AI | Claude API (chat + insights) |
+| AI | Gemini API (chat + insights) |
 | Infra | Vercel · GitHub REST API |
 
 ---
@@ -41,8 +41,7 @@ Enter any GitHub username → get an AI-powered breakdown:
 | Service | Where | What you need |
 |---|---|---|
 | GitHub | [settings/tokens](https://github.com/settings/tokens) → Classic → No scopes | `GITHUB_TOKEN` |
-| Anthropic | [console.anthropic.com](https://console.anthropic.com) → API Keys | `ANTHROPIC_API_KEY` ($5 free credit) |
-
+| Google Gemini | [aistudio.google.com](https://aistudio.google.com/) → API Keys | `GEMINI_API_KEY` |
 ### 2. Run Locally
 
 ```bash
@@ -54,7 +53,7 @@ npm install
 Create `.env.local` with all keys from above, then:
 
 ```bash
-node scripts/setup-db.js   # prints SQL → paste in Supabase SQL Editor → Run
+node scripts/setup-db.js
 npm run dev                 # → http://localhost:3000
 ```
 
