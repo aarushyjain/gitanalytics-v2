@@ -53,7 +53,6 @@ npm install
 Create `.env.local` with all keys from above, then:
 
 ```bash
-node scripts/setup-db.js
 npm run dev                 # → http://localhost:3000
 ```
 
